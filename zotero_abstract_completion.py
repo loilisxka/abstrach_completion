@@ -1,4 +1,5 @@
 import smtplib
+import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from zotero_abstract_completer import ZoteroAbstractCompleter
@@ -23,17 +24,31 @@ def send_email(subject, body, smtp_server, smtp_port, smtp_username, smtp_passwo
 
 
 def main():
-    # 在这里填写你的Zotero信息
-    ZOTERO_ID = "16076403"
-    ZOTERO_KEY = "ETem7u5Vn5TAVNARb6Djj4Kq"
+    # 从环境变量获取配置
+    ZOTERO_ID = os.environ.get("ZOTERO_ID")
+    ZOTERO_KEY = os.environ.get("ZOTERO_KEY")
     
     # SMTP服务器信息
-    SMTP_SERVER = "smtp.163.com"
-    SMTP_PORT = 25
-    SMTP_USERNAME = "18357457736@163.com"
-    SMTP_PASSWORD = "TBqvG34Ck9ePh5vn"
-    EMAIL_FROM = "18357457736@163.com"
-    EMAIL_TO = "2507608782@qq.com"
+    SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.163.com")
+    SMTP_PORT = int(os.environ.get("SMTP_PORT", "25"))
+    SMTP_USERNAME = os.environ.get("SMTP_USERNAME")
+    SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
+    EMAIL_FROM = os.environ.get("EMAIL_FROM")
+    EMAIL_TO = os.environ.get("EMAIL_TO")
+
+    # 验证必要的环境变量是否存在
+    required_vars = {
+        "ZOTERO_ID": ZOTERO_ID,
+        "ZOTERO_KEY": ZOTERO_KEY,
+        "SMTP_USERNAME": SMTP_USERNAME,
+        "SMTP_PASSWORD": SMTP_PASSWORD,
+        "EMAIL_FROM": EMAIL_FROM,
+        "EMAIL_TO": EMAIL_TO
+    }
+
+    missing_vars = [var for var, value in required_vars.items() if not value]
+    if missing_vars:
+        raise ValueError(f"缺少必要的环境变量: {', '.join(missing_vars)}")
 
     completer = ZoteroAbstractCompleter(ZOTERO_ID, ZOTERO_KEY)
     try:
