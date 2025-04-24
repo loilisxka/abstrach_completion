@@ -1,0 +1,41 @@
+name: Zotero Abstract Completion
+
+on:
+  schedule:
+    - cron: '0 22 * * 0'  # 每周日晚上10点运行
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  complete_abstracts:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+    
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies
+      run: |
+        uv venv
+        uv pip install -e ".[test]"
+    
+    - name: Run abstract completion script
+      env:
+        ZOTERO_ID: ${{ secrets.ZOTERO_ID }}
+        ZOTERO_KEY: ${{ secrets.ZOTERO_KEY }}
+        SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+        SMTP_PORT: ${{ secrets.SMTP_PORT }}
+        SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+        EMAIL_TO: ${{ secrets.EMAIL_TO }}
+      run: python zotero_abstract_completion.py 

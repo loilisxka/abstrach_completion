@@ -1,0 +1,12 @@
+[project]
+name = "abstrach-completion"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "diophila>=0.4.0",
+    "loguru>=0.7.3",
+    "pyzotero>=1.6.11",
+    "requests>=2.32.3",
+]
